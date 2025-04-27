@@ -12,7 +12,7 @@ export const StudentIdPreview = ({ studentPhotoUrl, isProcessing }: StudentIdPre
       <div className="flex justify-between items-start mb-6">
         <div className="w-24">
           <img 
-            src="/lovable-uploads/da944ed6-155d-4860-bb7a-a270684474f2.png" 
+            src="public/lovable-uploads/53a3d632-09f3-420a-b229-b7b6cd300b98.png" 
             alt="CODE Logo" 
             className="w-full h-auto"
           />
