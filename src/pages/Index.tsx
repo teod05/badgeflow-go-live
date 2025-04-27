@@ -62,37 +62,37 @@ const Index = () => {
         <div className="flex items-center justify-between mb-6">
           <div className="flex-1 flex items-center justify-between max-w-3xl mx-auto relative">
             <div className="flex flex-col items-center">
-              <div className="w-16 h-16 rounded-full bg-badgeflow-accent flex items-center justify-center shadow-md">
+              <div className="w-16 h-16 rounded-full bg-badgeflow-accent flex items-center justify-center shadow-md relative z-10">
                 <User className="h-8 w-8 text-white" />
               </div>
               <span className="text-xs mt-2 text-gray-600">Student</span>
             </div>
             
-            <div className="hidden md:block w-full h-0.5 bg-gray-200 absolute" style={{ top: '2rem' }} />
+            <div className="hidden md:block w-full h-1 bg-gradient-to-r from-badgeflow-accent/20 to-gray-200 absolute" style={{ top: '2rem' }} />
             
             <div className="flex flex-col items-center">
-              <div className="w-16 h-16 rounded-full bg-gray-100 border-2 border-gray-200 flex items-center justify-center shadow-sm">
+              <div className="w-16 h-16 rounded-full bg-gray-100 border-2 border-gray-200 flex items-center justify-center shadow-sm relative z-10">
                 <Camera className="h-8 w-8 text-gray-400" />
               </div>
               <span className="text-xs mt-2 text-gray-600">Photo</span>
             </div>
             
             <div className="flex flex-col items-center">
-              <div className="w-16 h-16 rounded-full bg-gray-100 border-2 border-gray-200 flex items-center justify-center shadow-sm">
+              <div className="w-16 h-16 rounded-full bg-gray-100 border-2 border-gray-200 flex items-center justify-center shadow-sm relative z-10">
                 <Printer className="h-8 w-8 text-gray-400" />
               </div>
               <span className="text-xs mt-2 text-gray-600">Print</span>
             </div>
             
             <div className="flex flex-col items-center">
-              <div className="w-16 h-16 rounded-full bg-gray-100 border-2 border-gray-200 flex items-center justify-center shadow-sm">
+              <div className="w-16 h-16 rounded-full bg-gray-100 border-2 border-gray-200 flex items-center justify-center shadow-sm relative z-10">
                 <CreditCard className="h-8 w-8 text-gray-400" />
               </div>
               <span className="text-xs mt-2 text-gray-600">Encode</span>
             </div>
             
             <div className="flex flex-col items-center">
-              <div className="w-16 h-16 rounded-full bg-gray-100 border-2 border-gray-200 flex items-center justify-center shadow-sm">
+              <div className="w-16 h-16 rounded-full bg-gray-100 border-2 border-gray-200 flex items-center justify-center shadow-sm relative z-10">
                 <CheckCircle className="h-8 w-8 text-gray-400" />
               </div>
               <span className="text-xs mt-2 text-gray-600">Complete</span>
