@@ -536,62 +536,83 @@ export const BadgeFlow = () => {
       case "complete":
         return (
           <div className="space-y-6">
-            <div className="bg-green-50 p-8 rounded-lg border border-green-200">
-              <div className="flex flex-col items-center justify-center text-center mb-6">
-                <div className="rounded-full bg-green-100 p-4 mb-4">
-                  <CheckCircle className="h-12 w-12 text-badgeflow-success" />
+            <div className="bg-gradient-to-br from-green-50 to-green-100 p-8 rounded-lg border border-green-200">
+              <div className="flex flex-col items-center justify-center text-center mb-8">
+                <div className="rounded-full bg-green-100 p-5 mb-4 ring-4 ring-green-50">
+                  <CheckCircle className="h-12 w-12 text-green-600" />
                 </div>
-                <h3 className="text-xl font-semibold mb-2">Badge Process Complete!</h3>
-                <p className="text-muted-foreground">
+                <h3 className="text-2xl font-semibold text-green-900 mb-2">Badge Process Complete!</h3>
+                <p className="text-green-700">
                   The student ID card has been printed and encoded successfully.
                 </p>
               </div>
               
-              <div className="space-y-4">
-                <div className="flex items-center gap-2 mb-2">
-                  <FileText className="h-5 w-5 text-badgeflow-accent" />
-                  <h4 className="text-lg font-semibold">Serial Number Logging</h4>
-                </div>
-                
-                {selectedStudent && (
-                  <div className="bg-white p-4 rounded-md border">
-                    <div className="grid grid-cols-2 gap-2 text-sm">
-                      <div className="font-semibold">Student:</div>
-                      <div>{selectedStudent.name}</div>
-                      <div className="font-semibold">ID Number:</div>
-                      <div>{selectedStudent.studentId}</div>
-                      <div className="font-semibold">NFC Serial:</div>
-                      <div className="font-mono">{nfcSerial}</div>
-                      <div className="font-semibold">Salto Serial:</div>
-                      <div className="font-mono">{saltoSerial}</div>
+              <div className="space-y-6">
+                <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+                  <div className="p-4 border-b border-gray-100">
+                    <div className="flex items-center gap-2 text-gray-900">
+                      <FileText className="h-5 w-5 text-gray-500" />
+                      <h4 className="font-semibold">Card Details</h4>
                     </div>
                   </div>
-                )}
-                
-                <div className="flex items-center gap-2 mb-2 mt-6">
-                  <Upload className="h-5 w-5 text-badgeflow-accent" />
-                  <h4 className="text-lg font-semibold">Data Export to Salto</h4>
+                  
+                  {selectedStudent && (
+                    <div className="p-4">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-1">
+                          <p className="text-sm text-gray-500">Student Name</p>
+                          <p className="font-medium">{selectedStudent.name}</p>
+                        </div>
+                        <div className="space-y-1">
+                          <p className="text-sm text-gray-500">Student ID</p>
+                          <p className="font-medium">{selectedStudent.studentId}</p>
+                        </div>
+                        <div className="space-y-1">
+                          <p className="text-sm text-gray-500">NFC Serial</p>
+                          <p className="font-mono text-sm bg-gray-50 p-1 rounded">{nfcSerial}</p>
+                        </div>
+                        <div className="space-y-1">
+                          <p className="text-sm text-gray-500">Salto Serial</p>
+                          <p className="font-mono text-sm bg-gray-50 p-1 rounded">{saltoSerial}</p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
-                
-                <Button onClick={downloadCsv} className="w-full">
-                  <FileText className="h-4 w-4 mr-2" />
-                  Download CSV for Salto
-                </Button>
-                
-                <div className="mt-6 bg-blue-50 p-4 rounded-md border border-blue-200">
-                  <div className="flex items-center gap-2">
-                    <Check className="h-5 w-5 text-blue-600" />
-                    <h4 className="font-semibold text-blue-700">Final Confirmation</h4>
+
+                <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+                  <div className="p-4 border-b border-gray-100">
+                    <div className="flex items-center gap-2 text-gray-900">
+                      <Upload className="h-5 w-5 text-gray-500" />
+                      <h4 className="font-semibold">Export Options</h4>
+                    </div>
                   </div>
-                  <p className="text-sm text-blue-600 mt-2">
-                    Please inform the student: "Your card will be ready to use from tomorrow."
-                  </p>
+                  
+                  <div className="p-4 space-y-4">
+                    <Button 
+                      onClick={downloadCsv} 
+                      className="w-full bg-white hover:bg-gray-50 text-gray-900 border border-gray-200"
+                    >
+                      <FileText className="h-4 w-4 mr-2" />
+                      Download CSV for Salto
+                    </Button>
+                    
+                    <div className="bg-blue-50 p-4 rounded-md border border-blue-100">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Check className="h-5 w-5 text-blue-600" />
+                        <h4 className="font-medium text-blue-900">Next Steps</h4>
+                      </div>
+                      <p className="text-sm text-blue-700">
+                        Please inform the student: "Your card will be ready to use from tomorrow."
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
             
             <div className="flex justify-end">
-              <Button onClick={resetProcess}>
+              <Button onClick={resetProcess} className="bg-white text-gray-900 border border-gray-200 hover:bg-gray-50">
                 Process New Student
               </Button>
             </div>
