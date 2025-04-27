@@ -1,11 +1,22 @@
+
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "@/hooks/use-toast";
-import { Search, Camera, Printer, CreditCard, CheckCircle } from "lucide-react";
+import { 
+  Search, 
+  Camera, 
+  Printer, 
+  CreditCard, 
+  CheckCircle, 
+  User,
+  Database,
+  Upload,
+  FileText,
+  Check
+} from "lucide-react";
 import { StudentCard } from "@/components/StudentCard";
 import { CameraCapture } from "@/components/CameraCapture";
 import { BadgePreview } from "@/components/BadgePreview";
@@ -50,6 +61,8 @@ const BadgeFlow = () => {
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const [nfcSerial, setNfcSerial] = useState<string>("");
+  const [saltoSerial, setSaltoSerial] = useState<string>("");
+  const [csvGenerated, setCsvGenerated] = useState<boolean>(false);
 
   const handleSearch = () => {
     const found = mockStudents.find(student => 
@@ -77,8 +90,8 @@ const BadgeFlow = () => {
     
     // In a real app, we would upload to HubSpot here
     toast({
-      title: "Photo captured",
-      description: "Photo has been saved to student profile.",
+      title: "Photo captured and uploaded",
+      description: "Photo has been saved to student profile in HubSpot.",
     });
   };
 
@@ -128,12 +141,44 @@ const BadgeFlow = () => {
 
   const handleNfcEncoding = () => {
     // In a real app, we would trigger NFC encoding here
-    setNfcSerial("NFC-" + Math.floor(Math.random() * 10000000).toString());
+    const generatedNfcSerial = "NFC-" + Math.floor(Math.random() * 10000000).toString();
+    setNfcSerial(generatedNfcSerial);
+    
+    // Generate Salto serial
+    const generatedSaltoSerial = "SALTO-" + Math.floor(Math.random() * 10000000).toString();
+    setSaltoSerial(generatedSaltoSerial);
+    
+    setCsvGenerated(true);
+    
     toast({
       title: "NFC encoded successfully",
-      description: "Card is ready for use.",
+      description: "Card encoded for both MyCard and Salto systems.",
     });
     goToNextStep();
+  };
+
+  const downloadCsv = () => {
+    if (!selectedStudent || !nfcSerial || !saltoSerial) return;
+    
+    const csvContent = [
+      "Student ID,Name,NFC Serial,Salto Serial",
+      `${selectedStudent.studentId},${selectedStudent.name},${nfcSerial},${saltoSerial}`
+    ].join('\n');
+    
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', `student_serials_${selectedStudent.studentId}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    toast({
+      title: "CSV Downloaded",
+      description: "Student serials have been exported to CSV for Salto import.",
+    });
   };
 
   const resetProcess = () => {
@@ -141,6 +186,8 @@ const BadgeFlow = () => {
     setSelectedStudent(null);
     setCapturedImage(null);
     setNfcSerial("");
+    setSaltoSerial("");
+    setCsvGenerated(false);
     setSearchQuery("");
   };
 
@@ -149,8 +196,12 @@ const BadgeFlow = () => {
       case "verify":
         return (
           <div className="space-y-6">
+            <div className="flex items-center gap-2 mb-4">
+              <User className="h-5 w-5 text-badgeflow-accent" />
+              <h3 className="text-lg font-semibold">Student Verification</h3>
+            </div>
             <div>
-              <Label htmlFor="search-student">Search for Student</Label>
+              <Label htmlFor="search-student">Search Student in HubSpot</Label>
               <div className="flex mt-2 gap-2">
                 <Input 
                   id="search-student" 
@@ -170,14 +221,26 @@ const BadgeFlow = () => {
             
             {selectedStudent && (
               <div className="mt-4">
-                <h3 className="text-lg font-semibold mb-2">Student Profile</h3>
+                <div className="flex items-center gap-2 mb-2">
+                  <Database className="h-5 w-5 text-badgeflow-accent" />
+                  <h3 className="text-lg font-semibold">Data Verification</h3>
+                </div>
                 <StudentCard student={selectedStudent} />
                 
                 {selectedStudent.hasAllData ? (
-                  <div className="mt-4 flex justify-end">
-                    <Button onClick={goToNextStep}>
-                      Continue to Photo Capture
-                    </Button>
+                  <div className="mt-4 bg-green-50 p-4 rounded-md border border-green-200">
+                    <h4 className="font-semibold flex items-center gap-2">
+                      <Check className="h-5 w-5 text-green-600" />
+                      <span className="text-green-700">All Data Available</span>
+                    </h4>
+                    <p className="text-sm text-green-600 mt-1">
+                      HubSpot data is complete. Ready to proceed with badge creation.
+                    </p>
+                    <div className="mt-4 flex justify-end">
+                      <Button onClick={goToNextStep}>
+                        Continue to Photo Capture
+                      </Button>
+                    </div>
                   </div>
                 ) : (
                   <div className="mt-4 bg-yellow-50 p-4 rounded-md border border-yellow-200">
@@ -197,8 +260,8 @@ const BadgeFlow = () => {
           <div className="space-y-6">
             <div>
               <div className="flex items-center gap-2 mb-4">
-                <h3 className="text-lg font-semibold">Photo Capture</h3>
                 <Camera className="h-5 w-5 text-badgeflow-accent" />
+                <h3 className="text-lg font-semibold">Photo Capture</h3>
               </div>
               <p className="text-sm text-muted-foreground mb-4">
                 Ensure the student is positioned against a white background and looking directly at the camera.
@@ -226,17 +289,17 @@ const BadgeFlow = () => {
           <div className="space-y-6">
             <div>
               <div className="flex items-center gap-2 mb-4">
-                <h3 className="text-lg font-semibold">Badge Preview</h3>
                 <Printer className="h-5 w-5 text-badgeflow-accent" />
+                <h3 className="text-lg font-semibold">Badge Preview & Printing</h3>
               </div>
               <p className="text-sm text-muted-foreground mb-4">
                 Review the badge before printing. Make sure all information is correct.
               </p>
               
-              {selectedStudent && capturedImage && (
+              {selectedStudent && (
                 <BadgePreview 
                   student={selectedStudent} 
-                  profileImage={capturedImage} 
+                  profileImage={capturedImage || undefined} 
                 />
               )}
             </div>
@@ -257,19 +320,32 @@ const BadgeFlow = () => {
           <div className="space-y-6">
             <div>
               <div className="flex items-center gap-2 mb-4">
-                <h3 className="text-lg font-semibold">NFC Encoding</h3>
                 <CreditCard className="h-5 w-5 text-badgeflow-accent" />
+                <h3 className="text-lg font-semibold">NFC Encoding</h3>
               </div>
               <p className="text-sm text-muted-foreground mb-4">
-                Tap the printed card against the NFC reader to encode access details.
+                Tap the printed card against both readers to encode access details.
               </p>
               
-              <div className="bg-gray-50 p-8 rounded-lg border-2 border-dashed border-gray-300 flex flex-col items-center justify-center text-center">
-                <CreditCard className="h-12 w-12 text-badgeflow-lightBlue mb-4" />
-                <h4 className="text-lg font-semibold mb-1">Ready to Encode</h4>
-                <p className="text-sm text-muted-foreground mb-4">
-                  Place the card on the NFC reader now
-                </p>
+              <div className="grid md:grid-cols-2 gap-6">
+                <div className="bg-gray-50 p-4 rounded-lg border-2 border-dashed border-gray-300 flex flex-col items-center justify-center text-center">
+                  <CreditCard className="h-8 w-8 text-badgeflow-lightBlue mb-2" />
+                  <h4 className="font-semibold mb-1">MyCard NFC Reader</h4>
+                  <p className="text-xs text-muted-foreground mb-4">
+                    Tap card to encode student access data
+                  </p>
+                </div>
+                
+                <div className="bg-gray-50 p-4 rounded-lg border-2 border-dashed border-gray-300 flex flex-col items-center justify-center text-center">
+                  <CreditCard className="h-8 w-8 text-badgeflow-lightBlue mb-2" />
+                  <h4 className="font-semibold mb-1">Salto System</h4>
+                  <p className="text-xs text-muted-foreground mb-4">
+                    Tap card to store access profile
+                  </p>
+                </div>
+              </div>
+              
+              <div className="mt-6 flex justify-center">
                 <Button onClick={handleNfcEncoding} className="w-full max-w-xs">
                   Simulate NFC Encoding
                 </Button>
@@ -287,31 +363,58 @@ const BadgeFlow = () => {
       case "complete":
         return (
           <div className="space-y-6">
-            <div className="bg-green-50 p-8 rounded-lg border border-green-200 flex flex-col items-center justify-center text-center">
-              <div className="rounded-full bg-green-100 p-4 mb-4">
-                <CheckCircle className="h-12 w-12 text-badgeflow-success" />
-              </div>
-              <h3 className="text-xl font-semibold mb-2">Badge Process Complete!</h3>
-              <p className="text-muted-foreground mb-6">
-                The student ID card has been printed and encoded successfully.
-              </p>
-              
-              {selectedStudent && (
-                <div className="w-full max-w-md bg-white p-4 rounded-md border mb-4">
-                  <div className="grid grid-cols-2 gap-2 text-sm">
-                    <div className="font-semibold">Student:</div>
-                    <div>{selectedStudent.name}</div>
-                    <div className="font-semibold">ID Number:</div>
-                    <div>{selectedStudent.studentId}</div>
-                    <div className="font-semibold">NFC Serial:</div>
-                    <div>{nfcSerial}</div>
-                  </div>
+            <div className="bg-green-50 p-8 rounded-lg border border-green-200">
+              <div className="flex flex-col items-center justify-center text-center mb-6">
+                <div className="rounded-full bg-green-100 p-4 mb-4">
+                  <CheckCircle className="h-12 w-12 text-badgeflow-success" />
                 </div>
-              )}
+                <h3 className="text-xl font-semibold mb-2">Badge Process Complete!</h3>
+                <p className="text-muted-foreground">
+                  The student ID card has been printed and encoded successfully.
+                </p>
+              </div>
               
-              <p className="text-sm font-medium text-badgeflow-blue">
-                Please inform the student: "Your card will be ready to use from tomorrow."
-              </p>
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <FileText className="h-5 w-5 text-badgeflow-accent" />
+                  <h4 className="text-lg font-semibold">Serial Number Logging</h4>
+                </div>
+                
+                {selectedStudent && (
+                  <div className="bg-white p-4 rounded-md border">
+                    <div className="grid grid-cols-2 gap-2 text-sm">
+                      <div className="font-semibold">Student:</div>
+                      <div>{selectedStudent.name}</div>
+                      <div className="font-semibold">ID Number:</div>
+                      <div>{selectedStudent.studentId}</div>
+                      <div className="font-semibold">NFC Serial:</div>
+                      <div className="font-mono">{nfcSerial}</div>
+                      <div className="font-semibold">Salto Serial:</div>
+                      <div className="font-mono">{saltoSerial}</div>
+                    </div>
+                  </div>
+                )}
+                
+                <div className="flex items-center gap-2 mb-2 mt-6">
+                  <Upload className="h-5 w-5 text-badgeflow-accent" />
+                  <h4 className="text-lg font-semibold">Data Export to Salto</h4>
+                </div>
+                
+                <Button onClick={downloadCsv} className="w-full">
+                  <FileText className="h-4 w-4 mr-2" />
+                  Download CSV for Salto
+                </Button>
+                
+                <div className="mt-6 bg-blue-50 p-4 rounded-md border border-blue-200">
+                  <div className="flex items-center gap-2">
+                    <Check className="h-5 w-5 text-blue-600" />
+                    <h4 className="font-semibold text-blue-700">Final Confirmation</h4>
+                  </div>
+                  <p className="text-sm text-blue-600 mt-2">
+                    Please inform the student: "Your card will be ready to use from tomorrow."
+                  </p>
+                </div>
+              </div>
             </div>
             
             <div className="flex justify-end">
@@ -345,33 +448,42 @@ const BadgeFlow = () => {
       
       <div className="flex justify-between items-center mb-8">
         <div className="flex space-x-2">
-          {["verify", "photo", "preview", "encode", "complete"].map((s) => (
-            <div 
-              key={s} 
-              className={`flex items-center ${s === "complete" ? "" : "after:content-[''] after:h-0.5 after:w-8 after:bg-gray-200 after:mx-2"}`}
-            >
-              <div 
-                className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold ${getStepStatus(s as Step)}`}
-              >
-                {s === "verify" && "1"}
-                {s === "photo" && "2"}
-                {s === "preview" && "3"}
-                {s === "encode" && "4"}
-                {s === "complete" && "✓"}
-              </div>
+          <div className={`flex items-center after:content-[''] after:h-0.5 after:w-8 after:bg-gray-200 after:mx-2`}>
+            <div className={`w-10 h-10 rounded-full flex items-center justify-center bg-white border ${getStepStatus("verify") === "step-active" ? "border-blue-500 text-blue-500" : getStepStatus("verify") === "step-completed" ? "border-green-500 bg-green-500 text-white" : "border-gray-300 text-gray-400"}`}>
+              <User className="h-4 w-4" />
             </div>
-          ))}
+          </div>
+          <div className={`flex items-center after:content-[''] after:h-0.5 after:w-8 after:bg-gray-200 after:mx-2`}>
+            <div className={`w-10 h-10 rounded-full flex items-center justify-center bg-white border ${getStepStatus("photo") === "step-active" ? "border-blue-500 text-blue-500" : getStepStatus("photo") === "step-completed" ? "border-green-500 bg-green-500 text-white" : "border-gray-300 text-gray-400"}`}>
+              <Camera className="h-4 w-4" />
+            </div>
+          </div>
+          <div className={`flex items-center after:content-[''] after:h-0.5 after:w-8 after:bg-gray-200 after:mx-2`}>
+            <div className={`w-10 h-10 rounded-full flex items-center justify-center bg-white border ${getStepStatus("preview") === "step-active" ? "border-blue-500 text-blue-500" : getStepStatus("preview") === "step-completed" ? "border-green-500 bg-green-500 text-white" : "border-gray-300 text-gray-400"}`}>
+              <Printer className="h-4 w-4" />
+            </div>
+          </div>
+          <div className={`flex items-center after:content-[''] after:h-0.5 after:w-8 after:bg-gray-200 after:mx-2`}>
+            <div className={`w-10 h-10 rounded-full flex items-center justify-center bg-white border ${getStepStatus("encode") === "step-active" ? "border-blue-500 text-blue-500" : getStepStatus("encode") === "step-completed" ? "border-green-500 bg-green-500 text-white" : "border-gray-300 text-gray-400"}`}>
+              <CreditCard className="h-4 w-4" />
+            </div>
+          </div>
+          <div>
+            <div className={`w-10 h-10 rounded-full flex items-center justify-center bg-white border ${getStepStatus("complete") === "step-active" ? "border-blue-500 text-blue-500" : getStepStatus("complete") === "step-completed" ? "border-green-500 bg-green-500 text-white" : "border-gray-300 text-gray-400"}`}>
+              <CheckCircle className="h-4 w-4" />
+            </div>
+          </div>
         </div>
       </div>
       
       <Card className="mb-8">
         <CardHeader>
           <CardTitle>
-            {step === "verify" && "Student Verification"}
-            {step === "photo" && "Photo Capture"}
+            {step === "verify" && "Student Verification & Data Check"}
+            {step === "photo" && "Photo Capture & HubSpot Upload"}
             {step === "preview" && "Badge Preview & Printing"}
-            {step === "encode" && "NFC Encoding"}
-            {step === "complete" && "Process Complete"}
+            {step === "encode" && "NFC Encoding & Access Management"}
+            {step === "complete" && "Process Complete & Data Export"}
           </CardTitle>
         </CardHeader>
         <CardContent>
