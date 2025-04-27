@@ -1,4 +1,3 @@
-
 import { 
   Sidebar, 
   SidebarContent, 
@@ -11,6 +10,7 @@ import {
 } from "@/components/ui/sidebar";
 import { Home, Users, CreditCard, Settings, UploadCloud } from "lucide-react";
 import { useLocation, Link } from "react-router-dom";
+import { Logo } from "./Logo";
 
 const menuItems = [
   {
@@ -47,7 +47,7 @@ export function AppSidebar() {
     <Sidebar>
       <SidebarContent>
         <div className="flex items-center justify-center py-6">
-          <h1 className="text-2xl font-bold text-badgeflow-blue">BadgeFlow</h1>
+          <Logo />
         </div>
         <SidebarGroup>
           <SidebarGroupLabel>Student Management</SidebarGroupLabel>
