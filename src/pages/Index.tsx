@@ -36,30 +36,22 @@ const RecentActivity = () => {
   ];
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Recent Activity</CardTitle>
-        <CardDescription>Latest student badging activities</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          {activities.map((activity) => (
-            <div key={activity.id} className="flex items-center justify-between p-2 border rounded">
-              <div>
-                <p className="font-medium">{activity.student}</p>
-                <p className="text-sm text-muted-foreground">{activity.action}</p>
-              </div>
-              <div className="flex items-center gap-2">
-                {activity.status === "success" && <CheckCircle className="h-4 w-4 text-badgeflow-success" />}
-                {activity.status === "pending" && <AlertCircle className="h-4 w-4 text-badgeflow-warning" />}
-                {activity.status === "error" && <AlertCircle className="h-4 w-4 text-badgeflow-error" />}
-                <span className="text-xs text-muted-foreground">{activity.timestamp}</span>
-              </div>
-            </div>
-          ))}
+    <div className="space-y-4">
+      {activities.map((activity) => (
+        <div key={activity.id} className="flex items-center justify-between p-2 border rounded">
+          <div>
+            <p className="font-medium">{activity.student}</p>
+            <p className="text-sm text-muted-foreground">{activity.action}</p>
+          </div>
+          <div className="flex items-center gap-2">
+            {activity.status === "success" && <CheckCircle className="h-4 w-4 text-badgeflow-success" />}
+            {activity.status === "pending" && <AlertCircle className="h-4 w-4 text-badgeflow-warning" />}
+            {activity.status === "error" && <AlertCircle className="h-4 w-4 text-badgeflow-error" />}
+            <span className="text-xs text-muted-foreground">{activity.timestamp}</span>
+          </div>
         </div>
-      </CardContent>
-    </Card>
+      ))}
+    </div>
   );
 };
 
@@ -106,9 +98,7 @@ const Index = () => {
           <CardDescription>Latest student badging activities</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
-            <RecentActivity />
-          </div>
+          <RecentActivity />
         </CardContent>
       </Card>
     </div>
