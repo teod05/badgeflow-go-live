@@ -1,7 +1,9 @@
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Camera, RefreshCcw } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { removeBackground, loadImage } from "@/utils/backgroundRemoval";
 
 interface CameraCaptureProps {
   onCapture: (imageDataUrl: string) => void;
@@ -10,9 +12,11 @@ interface CameraCaptureProps {
 export const CameraCapture = ({ onCapture }: CameraCaptureProps) => {
   const [isCameraActive, setIsCameraActive] = useState(false);
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [facingMode, setFacingMode] = useState<"user" | "environment">("user");
+  const { toast } = useToast();
 
   const activateCamera = async () => {
     try {
@@ -30,44 +34,74 @@ export const CameraCapture = ({ onCapture }: CameraCaptureProps) => {
       }
     } catch (err) {
       console.error("Error accessing camera:", err);
-      alert("Could not access camera. Please check permissions.");
+      toast({
+        variant: "destructive",
+        title: "Camera Error",
+        description: "Could not access camera. Please check permissions."
+      });
     }
   };
 
-  const capturePhoto = () => {
+  const capturePhoto = async () => {
     if (!videoRef.current || !canvasRef.current) return;
 
+    setIsProcessing(true);
     const video = videoRef.current;
     const canvas = canvasRef.current;
 
-    // Set canvas dimensions to match video dimensions
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
 
-    const ctx = canvas.getContext("2d");
+    const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // Draw the video frame onto the canvas
     ctx.save();
     if (facingMode === "user") {
-      // Flip horizontally if using front camera
       ctx.scale(-1, 1);
       ctx.translate(-canvas.width, 0);
     }
     ctx.drawImage(video, 0, 0);
     ctx.restore();
 
-    // Convert canvas to data URL
-    const imageDataUrl = canvas.toDataURL("image/jpeg", 0.8);
-    setCapturedImage(imageDataUrl);
-    onCapture(imageDataUrl);
+    try {
+      // Convert canvas to blob
+      const blob = await new Promise<Blob>((resolve) => 
+        canvas.toBlob((b) => b ? resolve(b) : null, 'image/jpeg', 0.8)
+      );
 
-    // Stop the camera stream
-    const stream = video.srcObject as MediaStream;
-    if (stream) {
-      stream.getTracks().forEach(track => track.stop());
+      // Load image for background removal
+      const img = await loadImage(blob);
+      
+      // Remove background
+      const processedBlob = await removeBackground(img);
+      
+      // Convert processed blob to data URL
+      const processedDataUrl = URL.createObjectURL(processedBlob);
+      
+      setCapturedImage(processedDataUrl);
+      onCapture(processedDataUrl);
+
+      // Stop the camera stream
+      const stream = video.srcObject as MediaStream;
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+      }
+      setIsCameraActive(false);
+      
+      toast({
+        title: "Success",
+        description: "Photo captured and background removed successfully."
+      });
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Processing Error",
+        description: "Failed to process the image. Please try again."
+      });
+      console.error('Error processing image:', error);
+    } finally {
+      setIsProcessing(false);
     }
-    setIsCameraActive(false);
   };
 
   const retakePhoto = () => {
@@ -76,15 +110,11 @@ export const CameraCapture = ({ onCapture }: CameraCaptureProps) => {
   };
 
   const toggleCamera = () => {
-    // Stop current stream
     if (videoRef.current && videoRef.current.srcObject) {
       const stream = videoRef.current.srcObject as MediaStream;
       stream.getTracks().forEach(track => track.stop());
     }
-
-    // Toggle camera
     setFacingMode(prev => prev === "user" ? "environment" : "user");
-    // Reactivate camera with new facing mode
     setTimeout(activateCamera, 100);
   };
 
@@ -100,6 +130,15 @@ export const CameraCapture = ({ onCapture }: CameraCaptureProps) => {
               muted 
               className={`w-full h-auto max-h-96 ${facingMode === "user" ? "scale-x-[-1]" : ""}`} 
             />
+            <div className="absolute inset-0 pointer-events-none">
+              <div className="h-full w-full flex items-center justify-center">
+                <div className="border-2 border-dashed border-badgeflow-accent rounded-lg w-64 h-80 opacity-50">
+                  <div className="h-full w-full flex items-center justify-center text-badgeflow-accent text-sm font-medium">
+                    Align face within frame
+                  </div>
+                </div>
+              </div>
+            </div>
             <div className="absolute top-4 left-4 bg-white bg-opacity-70 px-3 py-2 rounded-md text-sm font-medium">
               Center face in frame
             </div>
@@ -136,9 +175,12 @@ export const CameraCapture = ({ onCapture }: CameraCaptureProps) => {
               <RefreshCcw className="h-4 w-4 mr-2" />
               Switch Camera
             </Button>
-            <Button onClick={capturePhoto}>
+            <Button 
+              onClick={capturePhoto} 
+              disabled={isProcessing}
+            >
               <Camera className="h-4 w-4 mr-2" />
-              Capture Photo
+              {isProcessing ? 'Processing...' : 'Capture Photo'}
             </Button>
           </>
         )}
