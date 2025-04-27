@@ -1,7 +1,6 @@
-
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Users, CreditCard, CheckCircle, AlertCircle } from "lucide-react";
+import { Users, CreditCard, AlertCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const DashboardCard = ({ title, value, description, icon: Icon, color }: { 
@@ -69,11 +68,14 @@ const Index = () => {
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
         <Link to="/badge-flow">
-          <Button>New Badge Process</Button>
+          <Button size="lg" className="bg-badgeflow-accent hover:bg-badgeflow-accent/90 text-white font-medium gap-2">
+            <CreditCard className="h-5 w-5" />
+            New Badge Process
+          </Button>
         </Link>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-6">
+      <div className="grid gap-4 md:grid-cols-3 mb-6">
         <DashboardCard 
           title="Total Students" 
           value="248" 
@@ -95,35 +97,19 @@ const Index = () => {
           icon={AlertCircle}
           color="bg-badgeflow-warning" 
         />
-        <DashboardCard 
-          title="Integration Errors" 
-          value="3" 
-          description="Needs attention" 
-          icon={AlertCircle}
-          color="bg-badgeflow-error" 
-        />
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 mb-6">
-        <RecentActivity />
-        <Card>
-          <CardHeader>
-            <CardTitle>Quick Actions</CardTitle>
-            <CardDescription>Frequently used badge flow tasks</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <Link to="/badge-flow">
-              <Button className="w-full">Start New Badge Process</Button>
-            </Link>
-            <Link to="/export">
-              <Button className="w-full" variant="outline">Export NFC Serial Data</Button>
-            </Link>
-            <Link to="/students">
-              <Button className="w-full" variant="outline">View Student Database</Button>
-            </Link>
-          </CardContent>
-        </Card>
-      </div>
+      <Card className="mb-6">
+        <CardHeader>
+          <CardTitle>Recent Activity</CardTitle>
+          <CardDescription>Latest student badging activities</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            <RecentActivity />
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };
