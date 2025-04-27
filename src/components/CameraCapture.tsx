@@ -1,15 +1,15 @@
-
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Camera, RefreshCcw } from "lucide-react";
+import { Camera, RefreshCcw, SkipForward } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { removeBackground, loadImage } from "@/utils/backgroundRemoval";
 
 interface CameraCaptureProps {
   onCapture: (imageDataUrl: string) => void;
+  onSkip?: () => void;
 }
 
-export const CameraCapture = ({ onCapture }: CameraCaptureProps) => {
+export const CameraCapture = ({ onCapture, onSkip }: CameraCaptureProps) => {
   const [isCameraActive, setIsCameraActive] = useState(false);
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -158,41 +158,50 @@ export const CameraCapture = ({ onCapture }: CameraCaptureProps) => {
           <div className="flex flex-col items-center justify-center py-16">
             <Camera className="h-12 w-12 text-gray-300 mb-2" />
             <p className="text-muted-foreground">Camera inactive</p>
-            <p className="text-xs text-muted-foreground">Click activate button below</p>
+            <p className="text-xs text-muted-foreground mb-4">Click activate button below or skip</p>
+            <div className="flex gap-2">
+              <Button onClick={activateCamera} variant="outline">
+                <Camera className="h-4 w-4 mr-2" />
+                Activate Camera
+              </Button>
+              {onSkip && (
+                <Button onClick={onSkip}>
+                  <SkipForward className="h-4 w-4 mr-2" />
+                  Skip Photo
+                </Button>
+              )}
+            </div>
           </div>
         )}
         <canvas ref={canvasRef} style={{ display: "none" }} />
       </div>
 
       <div className="flex justify-center gap-4">
-        {!isCameraActive && !capturedImage && (
-          <Button onClick={activateCamera}>
-            <Camera className="h-4 w-4 mr-2" />
-            Activate Camera
-          </Button>
-        )}
-        
-        {isCameraActive && (
+        {!isCameraActive && !capturedImage ? null : (
           <>
-            <Button variant="outline" onClick={toggleCamera}>
-              <RefreshCcw className="h-4 w-4 mr-2" />
-              Switch Camera
-            </Button>
-            <Button 
-              onClick={capturePhoto} 
-              disabled={isProcessing}
-            >
-              <Camera className="h-4 w-4 mr-2" />
-              {isProcessing ? 'Processing...' : 'Capture Photo'}
-            </Button>
+            {isCameraActive && (
+              <>
+                <Button variant="outline" onClick={toggleCamera}>
+                  <RefreshCcw className="h-4 w-4 mr-2" />
+                  Switch Camera
+                </Button>
+                <Button 
+                  onClick={capturePhoto} 
+                  disabled={isProcessing}
+                >
+                  <Camera className="h-4 w-4 mr-2" />
+                  {isProcessing ? 'Processing...' : 'Capture Photo'}
+                </Button>
+              </>
+            )}
+            
+            {capturedImage && (
+              <Button variant="outline" onClick={retakePhoto}>
+                <RefreshCcw className="h-4 w-4 mr-2" />
+                Retake Photo
+              </Button>
+            )}
           </>
-        )}
-        
-        {capturedImage && (
-          <Button variant="outline" onClick={retakePhoto}>
-            <RefreshCcw className="h-4 w-4 mr-2" />
-            Retake Photo
-          </Button>
         )}
       </div>
     </div>

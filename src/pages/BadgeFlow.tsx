@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -81,6 +80,15 @@ const BadgeFlow = () => {
       title: "Photo captured",
       description: "Photo has been saved to student profile.",
     });
+  };
+
+  const handleSkipPhoto = () => {
+    setCapturedImage(null);
+    toast({
+      title: "Photo skipped",
+      description: "Proceeding without a photo. You can add one later.",
+    });
+    goToNextStep();
   };
 
   const goToNextStep = () => {
@@ -196,20 +204,7 @@ const BadgeFlow = () => {
                 Ensure the student is positioned against a white background and looking directly at the camera.
               </p>
               
-              <CameraCapture onCapture={handlePhotoCapture} />
-              
-              {capturedImage && (
-                <div className="mt-4">
-                  <h4 className="font-semibold mb-2">Preview:</h4>
-                  <div className="w-48 h-48 mx-auto overflow-hidden rounded-md border">
-                    <img 
-                      src={capturedImage} 
-                      alt="Captured" 
-                      className="w-full h-full object-cover" 
-                    />
-                  </div>
-                </div>
-              )}
+              <CameraCapture onCapture={handlePhotoCapture} onSkip={handleSkipPhoto} />
             </div>
             
             <div className="flex justify-between">
