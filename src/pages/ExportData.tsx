@@ -66,19 +66,22 @@ const ExportData = () => {
   };
 
   return (
-    <div className="p-6 max-w-6xl mx-auto">
-      <h1 className="text-3xl font-bold tracking-tight mb-6">Export Data</h1>
+    <div className="p-6 max-w-6xl mx-auto animate-fade-in">
+      <h1 className="text-3xl font-bold tracking-tight mb-6 animate-fade-in">Export Data</h1>
       
-      <Tabs defaultValue="salto">
+      <Tabs defaultValue="salto" className="animate-scale-in">
         <TabsList className="mb-4">
-          <TabsTrigger value="salto">Salto Export</TabsTrigger>
-          <TabsTrigger value="nfc">NFC Serial Numbers</TabsTrigger>
+          <TabsTrigger value="salto" className="transition-all duration-200 hover:bg-gray-100">Salto Export</TabsTrigger>
+          <TabsTrigger value="nfc" className="transition-all duration-200 hover:bg-gray-100">NFC Serial Numbers</TabsTrigger>
         </TabsList>
         
-        <TabsContent value="salto">
-          <Card>
+        <TabsContent value="salto" className="space-y-4">
+          <Card className="transition-all duration-300 hover:shadow-md">
             <CardHeader>
-              <CardTitle>Salto Export</CardTitle>
+              <CardTitle className="flex items-center gap-2">
+                <Database className="h-5 w-5 text-badgeflow-accent animate-pulse" />
+                Salto Export
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="mb-6">
@@ -87,9 +90,9 @@ const ExportData = () => {
                 </p>
               </div>
               
-              <div className="bg-gray-50 p-6 rounded-lg border mb-6">
+              <div className="bg-gray-50 p-6 rounded-lg border mb-6 transition-all duration-200 hover:border-badgeflow-accent">
                 <div className="flex items-center mb-4">
-                  <div className="w-12 h-12 rounded-full bg-badgeflow-accent flex items-center justify-center text-white mr-4">
+                  <div className="w-12 h-12 rounded-full bg-badgeflow-accent flex items-center justify-center text-white mr-4 transition-transform duration-300 hover:scale-110">
                     <Database className="h-6 w-6" />
                   </div>
                   <div>
@@ -98,12 +101,12 @@ const ExportData = () => {
                   </div>
                 </div>
                 
-                <div className="flex items-center justify-between p-3 bg-white rounded-md border">
+                <div className="flex items-center justify-between p-3 bg-white rounded-md border transition-all duration-200 hover:border-badgeflow-accent">
                   <div>
                     <p className="font-medium">Latest export:</p>
                     <p className="text-sm text-muted-foreground">April 24, 2023 - 15:42</p>
                   </div>
-                  <p className="text-sm text-green-600 font-medium">5 records successfully synced</p>
+                  <p className="text-sm text-green-600 font-medium animate-fade-in">5 records successfully synced</p>
                 </div>
               </div>
               
@@ -114,8 +117,9 @@ const ExportData = () => {
                 <Button 
                   onClick={handleExportToSalto}
                   disabled={isExporting}
+                  className="relative overflow-hidden transition-all duration-300 hover:scale-105"
                 >
-                  <ArrowRight className="h-4 w-4 mr-2" />
+                  <ArrowRight className={`h-4 w-4 mr-2 transition-transform duration-300 ${isExporting ? 'animate-spin' : ''}`} />
                   {isExporting ? "Exporting..." : "Export to Salto"}
                 </Button>
               </div>
@@ -123,8 +127,8 @@ const ExportData = () => {
           </Card>
         </TabsContent>
 
-        <TabsContent value="nfc">
-          <Card>
+        <TabsContent value="nfc" className="space-y-4">
+          <Card className="transition-all duration-300 hover:shadow-md">
             <CardHeader>
               <CardTitle>NFC Serial Numbers</CardTitle>
             </CardHeader>
@@ -136,16 +140,17 @@ const ExportData = () => {
                 <Button 
                   onClick={handleExportToCsv}
                   disabled={isExporting}
+                  className="relative overflow-hidden transition-all duration-300 hover:scale-105"
                 >
-                  <FileDown className="h-4 w-4 mr-2" />
+                  <FileDown className={`h-4 w-4 mr-2 transition-transform duration-300 ${isExporting ? 'animate-spin' : ''}`} />
                   {isExporting ? "Exporting..." : "Export to CSV"}
                 </Button>
               </div>
               
-              <div className="border rounded-md overflow-hidden">
+              <div className="border rounded-md overflow-hidden transition-all duration-300 hover:border-badgeflow-accent">
                 <Table>
                   <TableHeader>
-                    <TableRow>
+                    <TableRow className="hover:bg-gray-50 transition-colors duration-200">
                       <TableHead>Student Name</TableHead>
                       <TableHead>Student ID</TableHead>
                       <TableHead>NFC Serial</TableHead>
@@ -153,8 +158,15 @@ const ExportData = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {mockSerialData.map((row) => (
-                      <TableRow key={row.id}>
+                    {mockSerialData.map((row, index) => (
+                      <TableRow 
+                        key={row.id}
+                        className="hover:bg-gray-50 transition-colors duration-200"
+                        style={{ 
+                          animationDelay: `${index * 100}ms`,
+                          animation: 'fade-in 0.3s ease-out forwards'
+                        }}
+                      >
                         <TableCell>{row.studentName}</TableCell>
                         <TableCell>{row.studentId}</TableCell>
                         <TableCell className="font-mono">{row.nfcSerial}</TableCell>
