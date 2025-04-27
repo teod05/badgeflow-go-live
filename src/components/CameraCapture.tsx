@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Camera, RefreshCcw, SkipForward } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { removeBackground, loadImage } from "@/utils/backgroundRemoval";
+import { StudentIdPreview } from './StudentIdPreview';
 
 interface CameraCaptureProps {
   onCapture: (imageDataUrl: string) => void;
@@ -64,24 +65,19 @@ export const CameraCapture = ({ onCapture, onSkip }: CameraCaptureProps) => {
     ctx.restore();
 
     try {
-      // Convert canvas to blob
       const blob = await new Promise<Blob>((resolve) => 
         canvas.toBlob((b) => b ? resolve(b) : null, 'image/jpeg', 0.8)
       );
 
-      // Load image for background removal
       const img = await loadImage(blob);
       
-      // Remove background
       const processedBlob = await removeBackground(img);
       
-      // Convert processed blob to data URL
       const processedDataUrl = URL.createObjectURL(processedBlob);
       
       setCapturedImage(processedDataUrl);
       onCapture(processedDataUrl);
 
-      // Stop the camera stream
       const stream = video.srcObject as MediaStream;
       if (stream) {
         stream.getTracks().forEach(track => track.stop());
@@ -120,60 +116,69 @@ export const CameraCapture = ({ onCapture, onSkip }: CameraCaptureProps) => {
 
   return (
     <div className="space-y-4">
-      <div className="camera-container border rounded-lg overflow-hidden bg-gray-50 relative">
-        {isCameraActive || capturedImage ? (
-          <div className="relative">
-            {isCameraActive && !capturedImage && (
-              <>
-                <video 
-                  ref={videoRef} 
-                  autoPlay 
-                  playsInline 
-                  muted 
-                  className={`w-full h-auto max-h-96 ${facingMode === "user" ? "scale-x-[-1]" : ""}`}
-                />
-                <div className="absolute inset-0 pointer-events-none">
-                  <div className="h-full w-full flex items-center justify-center">
-                    <div className="border-2 border-dashed border-badgeflow-accent rounded-lg w-64 h-80 opacity-50">
-                      <div className="h-full w-full flex items-center justify-center text-badgeflow-accent text-sm font-medium">
-                        Align face within frame
+      <div className="grid md:grid-cols-2 gap-6">
+        <div className="camera-container border rounded-lg overflow-hidden bg-gray-50 relative">
+          {isCameraActive || capturedImage ? (
+            <div className="relative">
+              {isCameraActive && !capturedImage && (
+                <>
+                  <video 
+                    ref={videoRef} 
+                    autoPlay 
+                    playsInline 
+                    muted 
+                    className={`w-full h-auto max-h-96 ${facingMode === "user" ? "scale-x-[-1]" : ""}`}
+                  />
+                  <div className="absolute inset-0 pointer-events-none">
+                    <div className="h-full w-full flex items-center justify-center">
+                      <div className="border-2 border-dashed border-badgeflow-accent rounded-lg w-64 h-80 opacity-50">
+                        <div className="h-full w-full flex items-center justify-center text-badgeflow-accent text-sm font-medium">
+                          Align face within frame
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-                <div className="absolute top-4 left-4 bg-white bg-opacity-70 px-3 py-2 rounded-md text-sm font-medium">
-                  Center face in frame
-                </div>
-              </>
-            )}
-            {capturedImage && (
-              <img 
-                src={capturedImage} 
-                alt="Captured" 
-                className="w-full h-auto max-h-96" 
-              />
-            )}
-          </div>
-        ) : (
-          <div className="flex flex-col items-center justify-center py-16">
-            <Camera className="h-12 w-12 text-gray-300 mb-2" />
-            <p className="text-muted-foreground">Camera inactive</p>
-            <p className="text-xs text-muted-foreground mb-4">Click activate button below or skip</p>
-            <div className="flex gap-2">
-              <Button onClick={activateCamera} variant="outline">
-                <Camera className="h-4 w-4 mr-2" />
-                Activate Camera
-              </Button>
-              {onSkip && (
-                <Button onClick={onSkip}>
-                  <SkipForward className="h-4 w-4 mr-2" />
-                  Skip Photo
-                </Button>
+                  <div className="absolute top-4 left-4 bg-white bg-opacity-70 px-3 py-2 rounded-md text-sm font-medium">
+                    Center face in frame
+                  </div>
+                </>
+              )}
+              {capturedImage && (
+                <img 
+                  src={capturedImage} 
+                  alt="Captured" 
+                  className="w-full h-auto max-h-96" 
+                />
               )}
             </div>
-          </div>
-        )}
-        <canvas ref={canvasRef} style={{ display: "none" }} />
+          ) : (
+            <div className="flex flex-col items-center justify-center py-16">
+              <Camera className="h-12 w-12 text-gray-300 mb-2" />
+              <p className="text-muted-foreground">Camera inactive</p>
+              <p className="text-xs text-muted-foreground mb-4">Click activate button below or skip</p>
+              <div className="flex gap-2">
+                <Button onClick={activateCamera} variant="outline">
+                  <Camera className="h-4 w-4 mr-2" />
+                  Activate Camera
+                </Button>
+                {onSkip && (
+                  <Button onClick={onSkip}>
+                    <SkipForward className="h-4 w-4 mr-2" />
+                    Skip Photo
+                  </Button>
+                )}
+              </div>
+            </div>
+          )}
+          <canvas ref={canvasRef} style={{ display: "none" }} />
+        </div>
+
+        <div className="preview-container">
+          <StudentIdPreview 
+            studentPhotoUrl={capturedImage || undefined}
+            isProcessing={isProcessing}
+          />
+        </div>
       </div>
 
       <div className="flex justify-center gap-4">
