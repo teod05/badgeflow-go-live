@@ -69,56 +69,11 @@ const ExportData = () => {
     <div className="p-6 max-w-6xl mx-auto">
       <h1 className="text-3xl font-bold tracking-tight mb-6">Export Data</h1>
       
-      <Tabs defaultValue="nfc">
+      <Tabs defaultValue="salto">
         <TabsList className="mb-4">
-          <TabsTrigger value="nfc">NFC Serial Numbers</TabsTrigger>
           <TabsTrigger value="salto">Salto Export</TabsTrigger>
+          <TabsTrigger value="nfc">NFC Serial Numbers</TabsTrigger>
         </TabsList>
-        
-        <TabsContent value="nfc">
-          <Card>
-            <CardHeader>
-              <CardTitle>NFC Serial Numbers</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="mb-4 flex justify-between items-center">
-                <p className="text-sm text-muted-foreground">
-                  Export NFC serial numbers for all encoded student badges. This data can be used for batch importing into access management systems.
-                </p>
-                <Button 
-                  onClick={handleExportToCsv}
-                  disabled={isExporting}
-                >
-                  <FileDown className="h-4 w-4 mr-2" />
-                  {isExporting ? "Exporting..." : "Export to CSV"}
-                </Button>
-              </div>
-              
-              <div className="border rounded-md overflow-hidden">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Student Name</TableHead>
-                      <TableHead>Student ID</TableHead>
-                      <TableHead>NFC Serial</TableHead>
-                      <TableHead>Encoded Date</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {mockSerialData.map((row) => (
-                      <TableRow key={row.id}>
-                        <TableCell>{row.studentName}</TableCell>
-                        <TableCell>{row.studentId}</TableCell>
-                        <TableCell className="font-mono">{row.nfcSerial}</TableCell>
-                        <TableCell>{row.encodedDate}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
         
         <TabsContent value="salto">
           <Card>
@@ -163,6 +118,51 @@ const ExportData = () => {
                   <ArrowRight className="h-4 w-4 mr-2" />
                   {isExporting ? "Exporting..." : "Export to Salto"}
                 </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="nfc">
+          <Card>
+            <CardHeader>
+              <CardTitle>NFC Serial Numbers</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="mb-4 flex justify-between items-center">
+                <p className="text-sm text-muted-foreground">
+                  Export NFC serial numbers for all encoded student badges. This data can be used for batch importing into access management systems.
+                </p>
+                <Button 
+                  onClick={handleExportToCsv}
+                  disabled={isExporting}
+                >
+                  <FileDown className="h-4 w-4 mr-2" />
+                  {isExporting ? "Exporting..." : "Export to CSV"}
+                </Button>
+              </div>
+              
+              <div className="border rounded-md overflow-hidden">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Student Name</TableHead>
+                      <TableHead>Student ID</TableHead>
+                      <TableHead>NFC Serial</TableHead>
+                      <TableHead>Encoded Date</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {mockSerialData.map((row) => (
+                      <TableRow key={row.id}>
+                        <TableCell>{row.studentName}</TableCell>
+                        <TableCell>{row.studentId}</TableCell>
+                        <TableCell className="font-mono">{row.nfcSerial}</TableCell>
+                        <TableCell>{row.encodedDate}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
               </div>
             </CardContent>
           </Card>
