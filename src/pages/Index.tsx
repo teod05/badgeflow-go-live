@@ -1,6 +1,7 @@
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Users, CreditCard, AlertCircle } from "lucide-react";
+import { Users, CreditCard, CheckCircle, AlertCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const DashboardCard = ({ title, value, description, icon: Icon, color }: { 
