@@ -20,7 +20,7 @@ import {
 } from "lucide-react";
 import { StudentCard } from "@/components/StudentCard";
 import { removeBackground, loadImage } from "@/utils/backgroundRemoval";
-import { StudentIdPreview } from './StudentIdPreview';
+import { StudentIdPreview } from "@/components/StudentIdPreview";
 
 type Student = {
   id: string;
@@ -32,7 +32,6 @@ type Student = {
   hasAllData: boolean;
 };
 
-// Mock student data
 const mockStudents: Student[] = [
   {
     id: "1",
@@ -64,7 +63,7 @@ export const BadgeFlow = () => {
   const [nfcSerial, setNfcSerial] = useState<string>("");
   const [saltoSerial, setSaltoSerial] = useState<string>("");
   const [csvGenerated, setCsvGenerated] = useState<boolean>(false);
-	const [isCameraActive, setIsCameraActive] = useState(false);
+  const [isCameraActive, setIsCameraActive] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -91,7 +90,7 @@ export const BadgeFlow = () => {
     }
   };
 
-	const activateCamera = async () => {
+  const activateCamera = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ 
         video: { 
@@ -148,7 +147,7 @@ export const BadgeFlow = () => {
       const processedDataUrl = URL.createObjectURL(processedBlob);
       
       setCapturedImage(processedDataUrl);
-      onCapture(processedDataUrl);
+      handlePhotoCapture(processedDataUrl);
 
       const stream = video.srcObject as MediaStream;
       if (stream) {
@@ -189,7 +188,6 @@ export const BadgeFlow = () => {
   const handlePhotoCapture = (imageDataUrl: string) => {
     setCapturedImage(imageDataUrl);
     
-    // In a real app, we would upload to HubSpot here
     toast({
       title: "Photo captured and uploaded",
       description: "Photo has been saved to student profile in HubSpot.",
@@ -241,11 +239,9 @@ export const BadgeFlow = () => {
   };
 
   const handleNfcEncoding = () => {
-    // In a real app, we would trigger NFC encoding here
     const generatedNfcSerial = "NFC-" + Math.floor(Math.random() * 10000000).toString();
     setNfcSerial(generatedNfcSerial);
     
-    // Generate Salto serial
     const generatedSaltoSerial = "SALTO-" + Math.floor(Math.random() * 10000000).toString();
     setSaltoSerial(generatedSaltoSerial);
     
@@ -290,8 +286,8 @@ export const BadgeFlow = () => {
     setSaltoSerial("");
     setCsvGenerated(false);
     setSearchQuery("");
-		setIsCameraActive(false);
-		setIsProcessing(false);
+    setIsCameraActive(false);
+    setIsProcessing(false);
   };
 
   const renderStepContent = () => {
@@ -414,12 +410,10 @@ export const BadgeFlow = () => {
                         <Camera className="h-4 w-4 mr-2" />
                         Activate Camera
                       </Button>
-                      {onSkip && (
-                        <Button onClick={onSkip}>
-                          <SkipForward className="h-4 w-4 mr-2" />
-                          Skip Photo
-                        </Button>
-                      )}
+                      <Button onClick={handleSkipPhoto}>
+                        <SkipForward className="h-4 w-4 mr-2" />
+                        Skip Photo
+                      </Button>
                     </div>
                   </div>
                 )}
