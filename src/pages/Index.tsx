@@ -59,40 +59,48 @@ const Index = () => {
     <div className="p-6 max-w-7xl mx-auto">
       <div className="mb-12 animate-fade-in">
         <h1 className="text-3xl font-bold tracking-tight mb-8">Badge Issuance Flow</h1>
-        <div className="flex items-center justify-between mb-6 space-x-4">
+        <div className="flex items-center justify-between mb-6">
           <div className="flex-1 flex items-center justify-between max-w-3xl mx-auto">
-            <div className="flex items-center">
-              <div className="w-12 h-12 rounded-full bg-blue-500 flex items-center justify-center">
-                <User className="h-6 w-6 text-white" />
+            <div className="flex flex-col items-center">
+              <div className="w-16 h-16 rounded-full bg-blue-500 flex items-center justify-center">
+                <User className="h-7 w-7 text-white" />
               </div>
-              <div className="h-0.5 w-12 bg-gray-200" />
+              <span className="text-xs mt-2 text-gray-600">Student</span>
+              <div className="h-0.5 w-12 bg-gray-200 absolute -right-12 top-8 hidden md:block" />
             </div>
-            <div className="flex items-center">
-              <div className="w-12 h-12 rounded-full bg-gray-100 border-2 border-gray-200 flex items-center justify-center">
-                <Camera className="h-6 w-6 text-gray-400" />
+            
+            <div className="hidden md:block w-full h-0.5 bg-gray-200 absolute" style={{ top: '2rem' }} />
+            
+            <div className="flex flex-col items-center">
+              <div className="w-16 h-16 rounded-full bg-gray-100 border-2 border-gray-200 flex items-center justify-center">
+                <Camera className="h-7 w-7 text-gray-400" />
               </div>
-              <div className="h-0.5 w-12 bg-gray-200" />
+              <span className="text-xs mt-2 text-gray-600">Photo</span>
             </div>
-            <div className="flex items-center">
-              <div className="w-12 h-12 rounded-full bg-gray-100 border-2 border-gray-200 flex items-center justify-center">
-                <Printer className="h-6 w-6 text-gray-400" />
+            
+            <div className="flex flex-col items-center">
+              <div className="w-16 h-16 rounded-full bg-gray-100 border-2 border-gray-200 flex items-center justify-center">
+                <Printer className="h-7 w-7 text-gray-400" />
               </div>
-              <div className="h-0.5 w-12 bg-gray-200" />
+              <span className="text-xs mt-2 text-gray-600">Print</span>
             </div>
-            <div className="flex items-center">
-              <div className="w-12 h-12 rounded-full bg-gray-100 border-2 border-gray-200 flex items-center justify-center">
-                <CreditCard className="h-6 w-6 text-gray-400" />
+            
+            <div className="flex flex-col items-center">
+              <div className="w-16 h-16 rounded-full bg-gray-100 border-2 border-gray-200 flex items-center justify-center">
+                <CreditCard className="h-7 w-7 text-gray-400" />
               </div>
-              <div className="h-0.5 w-12 bg-gray-200" />
+              <span className="text-xs mt-2 text-gray-600">Encode</span>
             </div>
-            <div className="flex items-center">
-              <div className="w-12 h-12 rounded-full bg-gray-100 border-2 border-gray-200 flex items-center justify-center">
-                <CheckCircle className="h-6 w-6 text-gray-400" />
+            
+            <div className="flex flex-col items-center">
+              <div className="w-16 h-16 rounded-full bg-gray-100 border-2 border-gray-200 flex items-center justify-center">
+                <CheckCircle className="h-7 w-7 text-gray-400" />
               </div>
+              <span className="text-xs mt-2 text-gray-600">Complete</span>
             </div>
           </div>
         </div>
-        <div className="text-center">
+        <div className="text-center mt-8">
           <Link to="/badge-flow">
             <Button size="lg" className="bg-badgeflow-accent hover:bg-badgeflow-accent/90 text-white font-medium gap-2 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5">
               <CreditCard className="h-5 w-5" />
