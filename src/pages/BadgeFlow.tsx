@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -267,7 +266,11 @@ const BadgeFlow = () => {
                 Ensure the student is positioned against a white background and looking directly at the camera.
               </p>
               
-              <CameraCapture onCapture={handlePhotoCapture} onSkip={handleSkipPhoto} />
+              <CameraCapture 
+                onCapture={handlePhotoCapture} 
+                onSkip={handleSkipPhoto} 
+                student={selectedStudent || undefined}
+              />
             </div>
             
             <div className="flex justify-between">

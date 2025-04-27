@@ -8,9 +8,13 @@ import { StudentIdPreview } from './StudentIdPreview';
 interface CameraCaptureProps {
   onCapture: (imageDataUrl: string) => void;
   onSkip?: () => void;
+  student?: {
+    name?: string;
+    studentId?: string;
+  };
 }
 
-export const CameraCapture = ({ onCapture, onSkip }: CameraCaptureProps) => {
+export const CameraCapture = ({ onCapture, onSkip, student }: CameraCaptureProps) => {
   const [isCameraActive, setIsCameraActive] = useState(false);
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -177,6 +181,7 @@ export const CameraCapture = ({ onCapture, onSkip }: CameraCaptureProps) => {
           <StudentIdPreview 
             studentPhotoUrl={capturedImage || undefined}
             isProcessing={isProcessing}
+            student={student}
           />
         </div>
       </div>

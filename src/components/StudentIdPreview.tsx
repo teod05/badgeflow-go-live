@@ -4,9 +4,17 @@ import React from 'react';
 interface StudentIdPreviewProps {
   studentPhotoUrl?: string;
   isProcessing?: boolean;
+  student?: {
+    name?: string;
+    studentId?: string;
+  };
 }
 
-export const StudentIdPreview = ({ studentPhotoUrl, isProcessing }: StudentIdPreviewProps) => {
+export const StudentIdPreview = ({ 
+  studentPhotoUrl, 
+  isProcessing,
+  student 
+}: StudentIdPreviewProps) => {
   return (
     <div className="border rounded-lg p-4 bg-white shadow-sm">
       <div className="flex justify-between items-start mb-6">
@@ -28,12 +36,12 @@ export const StudentIdPreview = ({ studentPhotoUrl, isProcessing }: StudentIdPre
         <div className="space-y-4">
           <div>
             <p className="text-xs text-gray-600">STUDENT ID STUDIERENDENAUSWEIS</p>
-            <p className="font-medium">XY2234E12053</p>
+            <p className="font-medium">{student?.studentId || 'XY2234E12053'}</p>
           </div>
           
           <div>
             <p className="text-xs text-gray-600">NAME NAME</p>
-            <p className="font-medium">MATEUSZ PIATKOWSKI</p>
+            <p className="font-medium">{student?.name || 'MATEUSZ PIATKOWSKI'}</p>
           </div>
           
           <div>
@@ -68,3 +76,4 @@ export const StudentIdPreview = ({ studentPhotoUrl, isProcessing }: StudentIdPre
     </div>
   );
 };
+
