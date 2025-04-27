@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -61,6 +62,15 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				badgeflow: {
+					blue: '#0F172A', 
+					lightBlue: '#64748B',
+					accent: '#2563EB',
+					success: '#10B981',
+					error: '#EF4444',
+					warning: '#F59E0B',
+					gray: '#F1F5F9'
 				}
 			},
 			borderRadius: {
