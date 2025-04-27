@@ -12,14 +12,15 @@ export const CameraCapture = ({ onCapture }: CameraCaptureProps) => {
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [facingMode, setFacingMode] = useState<"user" | "environment">("user");
 
   const activateCamera = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ 
         video: { 
-          width: 640,
-          height: 480,
-          facingMode: "user" 
+          width: { ideal: 1920 },
+          height: { ideal: 1080 },
+          facingMode: facingMode
         } 
       });
       
@@ -29,39 +30,62 @@ export const CameraCapture = ({ onCapture }: CameraCaptureProps) => {
       }
     } catch (err) {
       console.error("Error accessing camera:", err);
-      // In a real app, we would show a proper error message
       alert("Could not access camera. Please check permissions.");
     }
   };
 
   const capturePhoto = () => {
-    if (videoRef.current && canvasRef.current) {
-      const canvas = canvasRef.current;
-      const video = videoRef.current;
-      
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
-      
-      const ctx = canvas.getContext("2d");
-      if (ctx) {
-        ctx.drawImage(video, 0, 0);
-        const imageDataUrl = canvas.toDataURL("image/jpeg");
-        setCapturedImage(imageDataUrl);
-        onCapture(imageDataUrl);
-        
-        // Stop camera stream
-        const stream = video.srcObject as MediaStream;
-        if (stream) {
-          stream.getTracks().forEach(track => track.stop());
-        }
-        setIsCameraActive(false);
-      }
+    if (!videoRef.current || !canvasRef.current) return;
+
+    const video = videoRef.current;
+    const canvas = canvasRef.current;
+
+    // Set canvas dimensions to match video dimensions
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    // Draw the video frame onto the canvas
+    ctx.save();
+    if (facingMode === "user") {
+      // Flip horizontally if using front camera
+      ctx.scale(-1, 1);
+      ctx.translate(-canvas.width, 0);
     }
+    ctx.drawImage(video, 0, 0);
+    ctx.restore();
+
+    // Convert canvas to data URL
+    const imageDataUrl = canvas.toDataURL("image/jpeg", 0.8);
+    setCapturedImage(imageDataUrl);
+    onCapture(imageDataUrl);
+
+    // Stop the camera stream
+    const stream = video.srcObject as MediaStream;
+    if (stream) {
+      stream.getTracks().forEach(track => track.stop());
+    }
+    setIsCameraActive(false);
   };
 
   const retakePhoto = () => {
     setCapturedImage(null);
     activateCamera();
+  };
+
+  const toggleCamera = () => {
+    // Stop current stream
+    if (videoRef.current && videoRef.current.srcObject) {
+      const stream = videoRef.current.srcObject as MediaStream;
+      stream.getTracks().forEach(track => track.stop());
+    }
+
+    // Toggle camera
+    setFacingMode(prev => prev === "user" ? "environment" : "user");
+    // Reactivate camera with new facing mode
+    setTimeout(activateCamera, 100);
   };
 
   return (
@@ -74,9 +98,9 @@ export const CameraCapture = ({ onCapture }: CameraCaptureProps) => {
               autoPlay 
               playsInline 
               muted 
-              className="w-full h-auto max-h-96 camera-guide"
+              className={`w-full h-auto max-h-96 ${facingMode === "user" ? "scale-x-[-1]" : ""}`} 
             />
-            <div className="absolute top-4 left-4 bg-white bg-opacity-50 p-1 rounded-md text-xs font-medium">
+            <div className="absolute top-4 left-4 bg-white bg-opacity-70 px-3 py-2 rounded-md text-sm font-medium">
               Center face in frame
             </div>
           </div>
@@ -98,7 +122,7 @@ export const CameraCapture = ({ onCapture }: CameraCaptureProps) => {
         <canvas ref={canvasRef} style={{ display: "none" }} />
       </div>
 
-      <div className="flex justify-center space-x-4">
+      <div className="flex justify-center gap-4">
         {!isCameraActive && !capturedImage && (
           <Button onClick={activateCamera}>
             <Camera className="h-4 w-4 mr-2" />
@@ -107,10 +131,16 @@ export const CameraCapture = ({ onCapture }: CameraCaptureProps) => {
         )}
         
         {isCameraActive && (
-          <Button onClick={capturePhoto}>
-            <Camera className="h-4 w-4 mr-2" />
-            Capture Photo
-          </Button>
+          <>
+            <Button variant="outline" onClick={toggleCamera}>
+              <RefreshCcw className="h-4 w-4 mr-2" />
+              Switch Camera
+            </Button>
+            <Button onClick={capturePhoto}>
+              <Camera className="h-4 w-4 mr-2" />
+              Capture Photo
+            </Button>
+          </>
         )}
         
         {capturedImage && (
