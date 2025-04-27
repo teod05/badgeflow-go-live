@@ -1,4 +1,6 @@
 import { useState, useRef, useEffect } from "react";
+import ReactConfetti from 'react-confetti';
+import { useWindowSize } from '@/hooks/use-window-size';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -68,6 +70,8 @@ export const BadgeFlow = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [facingMode, setFacingMode] = useState<"user" | "environment">("user");
+  const { width, height } = useWindowSize();
+  const [showConfetti, setShowConfetti] = useState(false);
 
   const handleSearch = () => {
     const found = mockStudents.find(student => 
@@ -251,6 +255,8 @@ export const BadgeFlow = () => {
       title: "NFC encoded successfully",
       description: "Card encoded for both MyCard and Salto systems.",
     });
+    setShowConfetti(true);
+    setTimeout(() => setShowConfetti(false), 5000);
     goToNextStep();
   };
 
@@ -288,6 +294,99 @@ export const BadgeFlow = () => {
     setSearchQuery("");
     setIsCameraActive(false);
     setIsProcessing(false);
+  };
+
+  const renderComplete = () => {
+    return (
+      <div className="space-y-6 relative">
+        {showConfetti && (
+          <ReactConfetti
+            width={width}
+            height={height}
+            recycle={false}
+            numberOfPieces={200}
+            gravity={0.2}
+          />
+        )}
+        <div className="bg-gradient-to-br from-green-50 to-green-100 p-8 rounded-lg border border-green-200">
+          <div className="flex flex-col items-center justify-center text-center mb-8">
+            <div className="relative">
+              <div className="rounded-full bg-green-100 p-5 mb-4 ring-4 ring-green-50 animate-scale-in">
+                <CheckCircle className="h-12 w-12 text-green-600 animate-[scale-in_0.5s_ease-out]" />
+              </div>
+              <div className="absolute inset-0 rounded-full bg-green-100 animate-ping opacity-25" />
+            </div>
+            <h3 className="text-2xl font-semibold text-green-900 mb-2 animate-fade-in">Badge Process Complete!</h3>
+            <p className="text-green-700 animate-fade-in">
+              The student ID card has been printed and encoded successfully.
+            </p>
+          </div>
+
+          <div className="space-y-6">
+            <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+              <div className="p-4 border-b border-gray-100">
+                <div className="flex items-center gap-2 text-gray-900">
+                  <FileText className="h-5 w-5 text-gray-500" />
+                  <h4 className="font-semibold">Card Details</h4>
+                </div>
+              </div>
+              
+              {selectedStudent && (
+                <div className="p-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-1">
+                      <p className="text-sm text-gray-500">Student Name</p>
+                      <p className="font-medium">{selectedStudent.name}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-sm text-gray-500">Student ID</p>
+                      <p className="font-medium">{selectedStudent.studentId}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-sm text-gray-500">NFC Serial</p>
+                      <p className="font-mono text-sm bg-gray-50 p-1 rounded">{nfcSerial}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-sm text-gray-500">Salto Serial</p>
+                      <p className="font-mono text-sm bg-gray-50 p-1 rounded">{saltoSerial}</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+              <div className="p-4 border-b border-gray-100">
+                <div className="flex items-center gap-2 text-gray-900">
+                  <Upload className="h-5 w-5 text-gray-500" />
+                  <h4 className="font-semibold">Export Options</h4>
+                </div>
+              </div>
+              
+              <div className="p-4 space-y-4">
+                <Button 
+                  onClick={downloadCsv} 
+                  className="w-full bg-white hover:bg-gray-50 text-gray-900 border border-gray-200"
+                >
+                  <FileText className="h-4 w-4 mr-2" />
+                  Download CSV for Salto
+                </Button>
+                
+                <div className="bg-blue-50 p-4 rounded-md border border-blue-100">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Check className="h-5 w-5 text-blue-600" />
+                    <h4 className="font-medium text-blue-900">Next Steps</h4>
+                  </div>
+                  <p className="text-sm text-blue-700">
+                    Please inform the student: "Your card will be ready to use from tomorrow."
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
   };
 
   const renderStepContent = () => {
@@ -534,90 +633,7 @@ export const BadgeFlow = () => {
         );
         
       case "complete":
-        return (
-          <div className="space-y-6">
-            <div className="bg-gradient-to-br from-green-50 to-green-100 p-8 rounded-lg border border-green-200">
-              <div className="flex flex-col items-center justify-center text-center mb-8">
-                <div className="rounded-full bg-green-100 p-5 mb-4 ring-4 ring-green-50">
-                  <CheckCircle className="h-12 w-12 text-green-600" />
-                </div>
-                <h3 className="text-2xl font-semibold text-green-900 mb-2">Badge Process Complete!</h3>
-                <p className="text-green-700">
-                  The student ID card has been printed and encoded successfully.
-                </p>
-              </div>
-              
-              <div className="space-y-6">
-                <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-                  <div className="p-4 border-b border-gray-100">
-                    <div className="flex items-center gap-2 text-gray-900">
-                      <FileText className="h-5 w-5 text-gray-500" />
-                      <h4 className="font-semibold">Card Details</h4>
-                    </div>
-                  </div>
-                  
-                  {selectedStudent && (
-                    <div className="p-4">
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-1">
-                          <p className="text-sm text-gray-500">Student Name</p>
-                          <p className="font-medium">{selectedStudent.name}</p>
-                        </div>
-                        <div className="space-y-1">
-                          <p className="text-sm text-gray-500">Student ID</p>
-                          <p className="font-medium">{selectedStudent.studentId}</p>
-                        </div>
-                        <div className="space-y-1">
-                          <p className="text-sm text-gray-500">NFC Serial</p>
-                          <p className="font-mono text-sm bg-gray-50 p-1 rounded">{nfcSerial}</p>
-                        </div>
-                        <div className="space-y-1">
-                          <p className="text-sm text-gray-500">Salto Serial</p>
-                          <p className="font-mono text-sm bg-gray-50 p-1 rounded">{saltoSerial}</p>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-                  <div className="p-4 border-b border-gray-100">
-                    <div className="flex items-center gap-2 text-gray-900">
-                      <Upload className="h-5 w-5 text-gray-500" />
-                      <h4 className="font-semibold">Export Options</h4>
-                    </div>
-                  </div>
-                  
-                  <div className="p-4 space-y-4">
-                    <Button 
-                      onClick={downloadCsv} 
-                      className="w-full bg-white hover:bg-gray-50 text-gray-900 border border-gray-200"
-                    >
-                      <FileText className="h-4 w-4 mr-2" />
-                      Download CSV for Salto
-                    </Button>
-                    
-                    <div className="bg-blue-50 p-4 rounded-md border border-blue-100">
-                      <div className="flex items-center gap-2 mb-2">
-                        <Check className="h-5 w-5 text-blue-600" />
-                        <h4 className="font-medium text-blue-900">Next Steps</h4>
-                      </div>
-                      <p className="text-sm text-blue-700">
-                        Please inform the student: "Your card will be ready to use from tomorrow."
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div className="flex justify-end">
-              <Button onClick={resetProcess} className="bg-white text-gray-900 border border-gray-200 hover:bg-gray-50">
-                Process New Student
-              </Button>
-            </div>
-          </div>
-        );
+        return renderComplete();
     }
   };
 
